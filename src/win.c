@@ -1600,6 +1600,8 @@ struct win *fill_win(session_t *ps, struct win *w) {
 	    .shadow_paint = PAINT_INIT,
 
 	    .corner_radius = 0,
+
+	    .transition_time = -1.0f,
 	};
 
 	assert(!w->destroyed);
@@ -1673,6 +1675,8 @@ struct win *fill_win(session_t *ps, struct win *w) {
 	    .height = g->height,
 	    .border_width = g->border_width,
 	};
+
+	new->transition_direction = ps->o.transition_direction;
 
 	free(g);
 
