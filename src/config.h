@@ -28,6 +28,8 @@
 #include "types.h"
 #include "win_defs.h"
 
+#include "timing_functions.h"
+
 typedef struct session session_t;
 
 /// @brief Possible backends
