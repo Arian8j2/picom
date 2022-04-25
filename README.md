@@ -1,119 +1,25 @@
-picom
-=====
+# Why another Picom fork?
+this fork add **configurable transition animations** to windows.
 
-[![circleci](https://circleci.com/gh/yshui/picom.svg?style=shield)](https://circleci.com/gh/yshui/picom)
-[![codecov](https://codecov.io/gh/yshui/picom/branch/next/graph/badge.svg?token=NRSegi0Gze)](https://codecov.io/gh/yshui/picom)
-[![chat on discord](https://img.shields.io/discord/1106224720833159198?logo=discord)](https://discord.gg/SY5JJzPgME)
+## How works?
+When window moves or get resized, it save new window geometry and then adds static offset (`transition_offset`) to it from direction that you specified (`transition-direction`) and calculate transition based on `transition-timing-function` and `transition-step`.
 
-__picom__ is a compositor for X, and a [fork of Compton](History.md).
+## Demo
+![ezgif-5-dbf86ee80e](https://user-images.githubusercontent.com/56799194/165058556-970aade7-177b-4df0-981e-a8599d20ae69.gif)
 
-You can leave your feedback or thoughts in the [discussion tab](https://github.com/yshui/picom/discussions), or chat with other users on [discord](https://discord.gg/SY5JJzPgME)!
 
-## Change Log
+- `transition`: enable transition (*bool*)
+- `transition-step`: time between frames in transition. (*float*)
+- `transition-offset`: offset that gives to window to start transitioning from there (*int*)
+- `transition-direction`: direction of transition like *top*, *bottom*, *left*, ... (use *none* for no transition) (*string*)
+- `transition-timing-function`: function that used to calculate transition timing, see [easings.net](https://easings.net/) website for list of supported functions, naming convensions are diffrent in that site tho, e.g *easeOutExpo* is *ease-out-expo* here. (*string*)
+- `transition-rule` (similar to opacity rule but it changes transition direction) (*list*)
 
-See [Releases](https://github.com/yshui/picom/releases)
+**more info about each config in *picom.sample.conf*.**
 
-## Build
-
-### Dependencies
-
-Assuming you already have all the usual building tools installed (e.g. gcc, python, meson, ninja, etc.), you still need:
-
-* libx11
-* libx11-xcb
-* libXext
-* xproto
-* xcb
-* xcb-util
-* xcb-damage
-* xcb-dpms
-* xcb-xfixes
-* xcb-shape
-* xcb-renderutil
-* xcb-render
-* xcb-randr
-* xcb-composite
-* xcb-image
-* xcb-present
-* xcb-glx
-* pixman
-* libdbus (optional, disable with the `-Ddbus=false` meson configure flag)
-* libconfig (optional, disable with the `-Dconfig_file=false` meson configure flag)
-* libGL, libEGL, libepoxy (optional, disable with the `-Dopengl=false` meson configure flag)
-* libpcre2 (optional, disable with the `-Dregex=false` meson configure flag)
-* libev
-* uthash
-
-On Debian based distributions (e.g. Ubuntu), the needed packages are
-
-```
-libconfig-dev libdbus-1-dev libegl-dev libev-dev libgl-dev libepoxy-dev libpcre2-dev libpixman-1-dev libx11-xcb-dev libxcb1-dev libxcb-composite0-dev libxcb-damage0-dev libxcb-dpms0-dev libxcb-glx0-dev libxcb-image0-dev libxcb-present-dev libxcb-randr0-dev libxcb-render0-dev libxcb-render-util0-dev libxcb-shape0-dev libxcb-util-dev libxcb-xfixes0-dev libxext-dev meson ninja-build uthash-dev
-```
-
-On Fedora, the needed packages are
-
-```
-dbus-devel gcc git libconfig-devel libdrm-devel libev-devel libX11-devel libX11-xcb libXext-devel libxcb-devel libGL-devel libEGL-devel libepoxy-devel meson pcre2-devel pixman-devel uthash-devel xcb-util-image-devel xcb-util-renderutil-devel xorg-x11-proto-devel xcb-util-devel
-```
-
-To build the documents, you need `asciidoc`
-
-### To build
-
+## Build and Install
+You can build and install from [AUR](https://aur.archlinux.org/packages/picom-arian8j2-git/) or use an AUR helper like `yay` to simplify the process:
 ```bash
-$ meson setup --buildtype=release build
-$ ninja -C build
+yay -S picom-arian8j2-git
 ```
-
-Built binary can be found in `build/src`
-
-If you have libraries and/or headers installed at non-default location (e.g. under `/usr/local/`), you might need to tell meson about them, since meson doesn't look for dependencies there by default.
-
-You can do that by setting the `CPPFLAGS` and `LDFLAGS` environment variables when running `meson`. Like this:
-
-```bash
-$ LDFLAGS="-L/path/to/libraries" CPPFLAGS="-I/path/to/headers" meson setup --buildtype=release build
-```
-
-As an example, on FreeBSD, you might have to run meson with:
-```bash
-$ LDFLAGS="-L/usr/local/lib" CPPFLAGS="-I/usr/local/include" meson setup --buildtype=release build
-$ ninja -C build
-```
-
-### To install
-
-``` bash
-$ ninja -C build install
-```
-
-Default install prefix is `/usr/local`, you can change it with `meson configure -Dprefix=<path> build`
-
-## How to Contribute
-
-All contributions are welcome!
-
-New features you think should be included in picom, a fix for a bug you found - please open a PR!
-
-You can take a look at the [Issues](https://github.com/yshui/picom/issues).
-
-Contributions to the documents and wiki are also appreciated.
-
-Even if you don't want to add anything to picom, you are still helping by compiling and running this branch, and report any issue you can find.
-
-### Become a Collaborator
-
-Becoming a collaborator of picom requires significant time commitment. You are expected to reply to issue reports, reviewing PRs, and sometimes fix bugs or implement new feature. You won't be able to push to the main branch directly, and all you code still has to go through code review.
-
-If this sounds good to you, feel free to contact me.
-
-## Contributors
-
-See [CONTRIBUTORS](CONTRIBUTORS)
-
-The README for the [original Compton project](https://github.com/chjj/compton/) can be found [here](History.md#Compton).
-
-## Licensing
-
-picom is free software, made available under the [MIT](LICENSES/MIT) and [MPL-2.0](LICENSES/MPL-2.0) software
-licenses. See the individual source files for details.
+checkout [official picom](https://github.com/yshui/picom) to manually build and install from source.
