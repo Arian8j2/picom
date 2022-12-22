@@ -969,9 +969,24 @@ static bool paint_preprocess(session_t *ps, bool *fade_running, bool *animation,
 			if (direction == TRANSITION_DIR_SMART_X ||
 			    direction == TRANSITION_DIR_SMART_Y) {
 
-				bool wide_enough = w->g.width > 80 * ps->root_width / 100;
-				bool bigger_than_half =
-				    w->target_geometry.x > ps->root_width / 2;
+				int16_t window_x = w->target_geometry.x;
+				int window_monitor_width = 0;
+
+				for (int i = 0, j = 0; ps->display_widths[i] != 0; i++) {
+					int display_width = ps->display_widths[i];
+
+					if (w->target_geometry.x < (display_width + j)) {
+						window_monitor_width = display_width;
+						window_x -= (int16_t)j;
+						break;
+					}
+
+					j += display_width;
+				}
+
+				bool wide_enough =
+				    w->g.width > 80 * window_monitor_width / 100;
+				bool bigger_than_half = window_x > window_monitor_width / 2;
 
 				/*
 				  Not changing transition_direction because
@@ -2142,6 +2157,15 @@ static session_t *session_init(int argc, char **argv, Display *dpy,
 
 	const xcb_query_extension_reply_t *ext_info;
 
+	// Fill display_widths with monitors widths
+	x_update_monitors(&ps->c, &ps->monitors);
+	ps->display_widths = malloc((unsigned int)(ps->monitors.count + 1) * sizeof(int));
+	for (int i = 0; i < ps->monitors.count; i++) {
+		auto e = pixman_region32_extents(&ps->monitors.regions[i]);
+		ps->display_widths[i] = e->x2 - e->x1;
+	}
+	ps->display_widths[ps->monitors.count] = 0;
+
 	// Start listening to events on root earlier to catch all possible
 	// root geometry changes
 	auto e = xcb_request_check(
@@ -2692,6 +2716,8 @@ static void session_destroy(session_t *ps) {
 	if (ps->redirected) {
 		unredirect(ps);
 	}
+
+	free(ps->display_widths);
 
 #ifdef CONFIG_OPENGL
 	free(ps->argb_fbconfig);

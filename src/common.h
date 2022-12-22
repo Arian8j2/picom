@@ -177,6 +177,8 @@ typedef struct session {
 	int root_width;
 	/// Height of root window.
 	int root_height;
+	/// Array that ends with zero and contains each screen (monitor) width
+	int *display_widths;
 	/// X Composite overlay window.
 	xcb_window_t overlay;
 	/// The target window for debug mode
