@@ -194,6 +194,8 @@ typedef struct session {
 	int root_height;
 	/// Width of root window.
 	int root_width;
+	/// Array that ends with zero and contains each screen (monitor) width
+	int *display_widths;
 	// Damage of root window.
 	// Damage root_damage;
 	/// X Composite overlay window.

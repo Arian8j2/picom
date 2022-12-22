@@ -756,9 +756,24 @@ paint_preprocess(session_t *ps, bool *fade_running, bool *animation) {
 			if (direction == TRANSITION_DIR_SMART_X ||
 			    direction == TRANSITION_DIR_SMART_Y) {
 
-				bool wide_enough = w->g.width > 80 * ps->root_width / 100;
-				bool bigger_than_half =
-				    w->target_geometry.x > ps->root_width / 2;
+				int16_t window_x = w->target_geometry.x;
+				int window_monitor_width = 0;
+
+				for (int i = 0, j = 0; ps->display_widths[i] != 0; i++) {
+					int display_width = ps->display_widths[i];
+
+					if (w->target_geometry.x < (display_width + j)) {
+						window_monitor_width = display_width;
+						window_x -= (int16_t)j;
+						break;
+					}
+
+					j += display_width;
+				}
+
+				bool wide_enough =
+				    w->g.width > 80 * window_monitor_width / 100;
+				bool bigger_than_half = window_x > window_monitor_width / 2;
 
 				/*
 				  Not changing transition_direction because
@@ -1806,6 +1821,47 @@ static session_t *session_init(int argc, char **argv, Display *dpy,
 	ps->root_width = screen->width_in_pixels;
 	ps->root_height = screen->height_in_pixels;
 
+	{
+		auto screen_resources_cookie =
+		    xcb_randr_get_screen_resources_current(ps->c, ps->root);
+		auto screen_resources = xcb_randr_get_screen_resources_current_reply(
+		    ps->c, screen_resources_cookie, NULL);
+		xcb_timestamp_t timestamp = screen_resources->config_timestamp;
+
+		int num_screens =
+		    xcb_randr_get_screen_resources_current_outputs_length(screen_resources);
+		ps->display_widths = malloc((unsigned int)(num_screens + 1) * sizeof(int));
+
+		xcb_randr_output_t *randr_outputs =
+		    xcb_randr_get_screen_resources_current_outputs(screen_resources);
+		int j = 0;
+		for (int i = 0; i < num_screens; i++) {
+			auto randr_output_info_cookie =
+			    xcb_randr_get_output_info(ps->c, randr_outputs[i], timestamp);
+			auto randr_output_info = xcb_randr_get_output_info_reply(
+			    ps->c, randr_output_info_cookie, NULL);
+
+			if (randr_output_info == NULL || randr_output_info->crtc == XCB_NONE ||
+			    randr_output_info->connection == XCB_RANDR_CONNECTION_DISCONNECTED) {
+				continue;
+			}
+
+			auto randr_crtc_cookie = xcb_randr_get_crtc_info(
+			    ps->c, randr_output_info->crtc, timestamp);
+			auto randr_crtc =
+			    xcb_randr_get_crtc_info_reply(ps->c, randr_crtc_cookie, NULL);
+
+			ps->display_widths[j] = (int)randr_crtc->width;
+			j++;
+
+			free(randr_crtc);
+			free(randr_output_info);
+		}
+
+		ps->display_widths[j] = 0;
+		free(screen_resources);
+	}
+
 	// Start listening to events on root earlier to catch all possible
 	// root geometry changes
 	auto e = xcb_request_check(
@@ -2312,6 +2368,8 @@ static void session_destroy(session_t *ps) {
 	if (ps->redirected) {
 		unredirect(ps);
 	}
+
+	free(ps->display_widths);
 
 #ifdef CONFIG_OPENGL
 	free(ps->argb_fbconfig);
