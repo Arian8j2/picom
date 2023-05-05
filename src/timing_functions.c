@@ -108,15 +108,15 @@ double ease_in_out_quart(double t) {
     return t < 0.5 ? 8 * t * t * t * t : 1 - pow(-2 * t + 2, 4) / 2;
 }
 
-double ease_in_etpo(double t) {
+double ease_in_expo(double t) {
     return t == 0 ? 0 : pow(2, 10 * t - 10);
 }
 
-double ease_out_etpo(double t) {
+double ease_out_expo(double t) {
     return t == 1 ? 1 : 1 - pow(2, -10 * t);
 }
 
-double ease_in_out_etpo(double t) {
+double ease_in_out_expo(double t) {
     return t == 0
     ? 0
     : t == 1

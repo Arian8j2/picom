@@ -33,9 +33,9 @@ double ease_in_quart(double t);
 double ease_out_quart(double t);
 double ease_in_out_quart(double t);
 
-double ease_in_etpo(double t);
-double ease_out_etpo(double t);
-double ease_in_out_etpo(double t);
+double ease_in_expo(double t);
+double ease_out_expo(double t);
+double ease_in_out_expo(double t);
 
 double ease_in_back(double t);
 double ease_out_back(double t);
