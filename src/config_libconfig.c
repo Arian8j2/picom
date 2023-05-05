@@ -291,7 +291,7 @@ timing_function parse_timing_function(const char *timing_name) {
 	// clang-format off
 	static const char *names[] = {
 		"sine", "cubic", "quint", "circ", "elastic",
-		"quad", "quart", "etpo", "back", "bounce"
+		"quad", "quart", "expo", "back", "bounce"
 	};
 
 	static const char *prefixes[] = {"in", "out", "in-out"};
@@ -304,7 +304,7 @@ timing_function parse_timing_function(const char *timing_name) {
 		ease_in_elastic, ease_out_elastic, ease_in_out_elastic,
 		ease_in_quad   , ease_out_quad   , ease_in_out_quad   ,
 		ease_in_quart  , ease_out_quart  , ease_in_out_quart  ,
-		ease_in_etpo   , ease_out_etpo   , ease_in_out_etpo   ,
+		ease_in_expo   , ease_out_expo   , ease_in_out_expo   ,
 		ease_in_back   , ease_out_back   , ease_in_out_back   ,
 		ease_in_bounce , ease_out_bounce , ease_in_out_bounce ,
 	};
