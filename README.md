@@ -1,5 +1,35 @@
+> [!WARNING]
+> [Picom](https://github.com/yshui/picom) now has a rich animation system, use it instead. This fork doesn't get any updates but you can achieve a similar animation effect by using this configuration in vanilla Picom:
+> ```
+> animations = (
+>   {
+>     triggers = [ "open" ];
+>     preset = "appear";
+>   },
+>   {
+>     triggers = [ "close" ];
+>     preset = "disappear";
+>   },
+>   {
+>     triggers = [ "geometry" ];
+>     offset-x = {
+>       curve = "cubic-bezier(0.17, 0.67, 0.68, 1.03)";
+>       end = 0;
+>       duration = "duration";
+>       start = "- offset";
+>     };
+>     shadow-offset-x = "offset-x";
+>
+>     # Same as `transition-offset`
+>     offset = 100;
+>     # Duration of animation in seconds
+>     duration = 0.25;
+>   }
+> )
+> ```
+
 # Why another Picom fork?
-this fork add **configurable transition animations** to windows.
+This fork add **configurable transition animations** to windows.
 
 ## How works?
 When window moves or get resized, it save new window geometry and then adds static offset (`transition_offset`) to it from direction that you specified (`transition-direction`) and calculate transition based on `transition-timing-function` and `transition-step`.
